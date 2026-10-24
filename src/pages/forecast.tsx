@@ -1,28 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
-
 import { ForecastChart } from "@/components/charts";
 import { MetricRow } from "@/components/metrics";
 import { ChartSkeleton, EmptyState, ErrorPanel, PageHeader, Panel } from "@/components/states";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useFilters, useForecast } from "@/hooks/use-api";
+import { usePageMeta } from "@/hooks/use-page-meta";
 import { fmtNum, fmtSigned, londonDateTime, londonTime, longDate } from "@/lib/format";
 
-export const Route = createFileRoute("/forecast")({
-  head: () => ({
-    meta: [
-      { title: "Day Forecast · Wind Forecast Desk" },
-      { name: "description", content: "Day-ahead wind forecast versus actual generation for a single delivery day." },
-      { property: "og:title", content: "Day Forecast · Wind Forecast Desk" },
-      { property: "og:description", content: "Forecast versus actual wind generation with an indicative expected range." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
-  component: ForecastPage,
-});
-
-function ForecastPage() {
+export function ForecastPage() {
+  usePageMeta(
+    "Day Forecast · Wind Forecast Desk",
+    "Day-ahead wind forecast versus actual generation for a single delivery day.",
+  );
   const { date, cutoff } = useFilters();
   const fc = useForecast(date, cutoff);
   const d = fc.data;

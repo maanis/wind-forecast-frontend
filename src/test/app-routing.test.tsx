@@ -1,17 +1,39 @@
-import { QueryClient } from "@tanstack/react-query";
-import { createRouter, rootRouteId } from "@tanstack/react-router";
-import { describe, expect, it } from "vitest";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter, useLocation } from "react-router-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { routeTree } from "@/routeTree.gen";
+import App from "@/App";
 
-// Match routes without running loaders or rendering: loaders may need a server or
-// network the test run lacks, and jsdom never loads the stylesheets React waits on.
+function LocationProbe() {
+  const { pathname, search } = useLocation();
+  return <div data-testid="loc">{pathname + search}</div>;
+}
+
+function renderAt(url: string) {
+  return render(
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <MemoryRouter initialEntries={[url]}>
+        <App />
+        <LocationProbe />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
 describe("App routing", () => {
-  it("matches a page for / instead of falling back to not found", () => {
-    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+  beforeEach(() => {
+    // Pages call the API on mount; keep the test offline.
+    vi.stubGlobal("fetch", vi.fn(() => Promise.reject(new Error("offline"))));
+  });
 
-    const matches = router.matchRoutes("/");
+  it("redirects / to /dashboard and keeps the query string", async () => {
+    renderAt("/?date=2026-01-10&cutoff=08:00");
+    expect(await screen.findByTestId("loc")).toHaveTextContent("/dashboard?date=2026-01-10&cutoff=08:00");
+  });
 
-    expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
+  it("shows the 404 page for unknown routes", async () => {
+    renderAt("/nope");
+    expect(await screen.findByText("Page not found")).toBeInTheDocument();
   });
 });
