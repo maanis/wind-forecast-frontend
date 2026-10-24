@@ -3,6 +3,7 @@ import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import { AppShell } from "@/components/app-shell";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { NotFound } from "@/components/not-found";
 import { AccuracyPage } from "@/pages/accuracy";
 import { Dashboard } from "@/pages/dashboard";
 import { ForecastPage } from "@/pages/forecast";
@@ -11,11 +12,6 @@ import { ForecastPage } from "@/pages/forecast";
 function RedirectToDashboard() {
   const { search } = useLocation();
   return <Navigate to={{ pathname: "/dashboard", search }} replace />;
-}
-
-function RedirectUnknownRoute() {
-  const { search } = useLocation();
-  return <Navigate to={{ pathname: "/", search }} replace />;
 }
 
 function ScrollToTop() {
@@ -44,7 +40,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/forecast" element={<ForecastPage />} />
           <Route path="/accuracy" element={<AccuracyPage />} />
-          <Route path="*" element={<RedirectUnknownRoute />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </ErrorBoundary>

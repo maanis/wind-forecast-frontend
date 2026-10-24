@@ -210,6 +210,19 @@ AI tools accelerated implementation, but the resulting code, API contract,
 validation, accessibility behavior, and test/build checks should still be
 reviewed by the maintainers before production use.
 
+## Continuing development in Lovable
+
+You can continue developing this project in the
+[Lovable editor](https://lovable.dev/projects/bcacc6b8-a340-4a77-893c-1f080484ad1f).
+
+- Describe the next change and Lovable can update the project.
+- Changes made in Lovable are synchronized with the connected repository.
+- The repository remains available for local development, code review, and
+  deployment through your normal Git workflow.
+
+When working locally, keep the repository and Lovable project synchronized and
+avoid committing local environment files or backend credentials.
+
 ## Deployment
 
 Build the static frontend:
