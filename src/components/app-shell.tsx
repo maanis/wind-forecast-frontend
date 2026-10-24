@@ -32,13 +32,13 @@ export function CutoffSelect({ value, onChange, id }: { value: string | undefine
   );
 }
 
-export function DateInput({ value, onChange, id, min = MIN_DATE, max = MAX_DATE }: { value: string | undefined; onChange: (v: string) => void; id: string; min?: string; max?: string }) {
+export function DateInput({ value, onChange, id, min, max }: { value: string | undefined; onChange: (v: string) => void; id: string; min?: string | undefined; max?: string | undefined }) {
   return (
     <Input
       id={id}
       type="date"
-      min={min}
-      max={max}
+      min={min ?? MIN_DATE}
+      max={max ?? MAX_DATE}
       value={value ?? ""}
       onChange={(e) => isValidDate(e.target.value) && onChange(e.target.value)}
       className="tabular h-8 w-[148px] text-sm"

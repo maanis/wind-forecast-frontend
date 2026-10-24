@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Centralized REST client for the Wind Forecast backend. No mock data, no fallbacks.
 export const API_BASE_URL: string =
   (import.meta.env["VITE_API_BASE_URL"] as string | undefined)?.replace(/\/$/, "") ||
@@ -157,7 +158,7 @@ export async function fetchForecast(date: string, cutoff: string, signal?: Abort
     forecast_published_to: str(d.forecast_published_to),
     summary: { mean_forecast: num(s.mean_forecast), min_forecast: num(s.min_forecast), max_forecast: num(s.max_forecast) },
     accuracy: isObj(d.accuracy) ? toMetrics(d.accuracy) : toMetrics({}),
-    points: d.points.filter(isObj).filter((p) => typeof p.startTime === "string").map((p) => ({
+    points: d.points.filter(isObj).filter((p: any) => typeof p.startTime === "string").map((p: any) => ({
       startTime: p.startTime as string,
       forecast: num(p.forecast),
       actual: num(p.actual),
@@ -175,7 +176,7 @@ export async function fetchAccuracy(start: string, end: string, cutoff: string, 
   if (!isObj(d) || !isObj(d.overall)) invalid("accuracy");
   let daily: DailyMetrics[] = [];
   if (Array.isArray(d.daily)) {
-    daily = d.daily.filter(isObj).filter((r) => typeof r.date === "string").map((r) => ({ date: r.date as string, ...toMetrics(r) }));
+    daily = d.daily.filter(isObj).filter((r: any) => typeof r.date === "string").map((r: any) => ({ date: r.date as string, ...toMetrics(r) }));
   } else if (isObj(d.daily)) {
     daily = Object.entries(d.daily).filter(([, v]) => isObj(v)).map(([date, v]) => ({ date, ...toMetrics(v) }));
   }
@@ -187,9 +188,9 @@ export async function fetchHorizon(start: string, end: string, bucketHours: numb
   const d = await get("/api/accuracy/horizon", { start, end, bucket_hours: bucketHours }, signal);
   if (!isObj(d) || !Array.isArray(d.buckets)) invalid("horizon");
   return {
-    buckets: d.buckets.filter(isObj).filter((b) => num(b.horizon_from_h) !== null && num(b.horizon_to_h) !== null).map((b) => {
+    buckets: d.buckets.filter(isObj).filter((b: any) => num(b.horizon_from_h) !== null && num(b.horizon_to_h) !== null).map((b: any) => {
       const out: HorizonBucket = { horizon_from_h: b.horizon_from_h as number, horizon_to_h: b.horizon_to_h as number };
-      for (const k of METRIC_KEYS) if (k in b) (out as Record<string, Num>)[k] = num(b[k]);
+      for (const k of METRIC_KEYS) if (k in b) (out as unknown as Record<string, Num>)[k] = num(b[k]);
       return out;
     }),
   };
