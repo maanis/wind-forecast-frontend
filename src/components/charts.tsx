@@ -44,7 +44,7 @@ export function DailyErrorChart({ data, onSelect, height = 280 }: { data: DailyM
             cursor={{ fill: "var(--muted)" }}
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
-              const d = payload[0].payload as DailyMetrics;
+              const d = payload[0]!.payload as DailyMetrics;
               return <TipBox title={shortDate(d.date) + (onSelect ? " · click to open" : "")} rows={[
                 ["MAE", `${fmtNum(d.mae)} MW`, "var(--chart-3)"],
                 ["Bias", `${fmtSigned(d.bias)} MW`, "var(--series-forecast)"],
@@ -75,7 +75,7 @@ export function ForecastChart({ points, height = 360 }: { points: ForecastPoint[
             cursor={{ stroke: "var(--border)" }}
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
-              const d = payload[0].payload as FPoint;
+              const d = payload[0]!.payload as FPoint;
               const rows: [string, string, string?][] = [
                 ["Forecast", `${fmtNum(d.forecast)} MW`, "var(--series-forecast)"],
                 ["Actual", `${fmtNum(d.actual)} MW`, "var(--series-actual)"],
@@ -110,7 +110,7 @@ export function HorizonChart({ buckets, height = 260 }: { buckets: HorizonBucket
             cursor={{ fill: "var(--muted)" }}
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
-              const d = payload[0].payload as HorizonBucket & { label: string };
+              const d = payload[0]!.payload as HorizonBucket & { label: string };
               return <TipBox title={`Lead time ${d.label}`} rows={[
                 ["MAE", `${fmtNum(d.mae)} MW`, "var(--series-forecast)"],
                 ["RMSE", `${fmtNum(d.rmse)} MW`, "var(--chart-4)"],

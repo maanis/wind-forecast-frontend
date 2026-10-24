@@ -1,6 +1,6 @@
 // Centralized REST client for the Wind Forecast backend. No mock data, no fallbacks.
 export const API_BASE_URL: string =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ||
+  (import.meta.env["VITE_API_BASE_URL"] as string | undefined)?.replace(/\/$/, "") ||
   "https://YOUR-BACKEND.vercel.app";
 
 export type Num = number | null;
@@ -83,16 +83,18 @@ const METRIC_KEYS: (keyof Metrics)[] = [
   "n", "mae", "rmse", "bias", "wmape", "p10_error", "p50_error", "p90_error", "p95_abs_error", "mean_actual",
 ];
 
-const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isObj = (v: unknown): v is any => typeof v === "object" && v !== null && !Array.isArray(v);
 const num = (v: unknown): Num => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
 function invalid(what: string): never {
   throw new ApiError("invalid", `Unexpected response shape: ${what}`);
 }
 
-function toMetrics(v: unknown): Metrics {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function toMetrics(v: any): Metrics {
   if (!isObj(v)) invalid("metrics object missing");
-  const m = {} as Metrics;
+  const m = {} as Record<keyof Metrics, Num>;
   for (const k of METRIC_KEYS) m[k] = num(v[k]);
   return m;
 }
@@ -102,7 +104,7 @@ async function get(path: string, params: Record<string, string | number>, signal
   const url = `${API_BASE_URL}${path}${qs ? `?${qs}` : ""}`;
   let res: Response;
   try {
-    res = await fetch(url, { signal, headers: { Accept: "application/json" } });
+    res = await fetch(url, { signal: signal ?? null, headers: { Accept: "application/json" } });
   } catch (e) {
     if ((e as Error).name === "AbortError") throw e;
     throw new ApiError("network", "Could not reach the forecast API. Check your connection or the API URL.");
@@ -130,8 +132,8 @@ async function get(path: string, params: Record<string, string | number>, signal
 export async function fetchMeta(signal?: AbortSignal): Promise<MetaResponse> {
   const d = await get("/api/meta", {}, signal);
   if (!isObj(d) || typeof d.default_cutoff !== "string" || !isObj(d.default_range)) invalid("meta");
-  const a = isObj(d.actuals) ? d.actuals : {};
-  const f = isObj(d.forecasts) ? d.forecasts : {};
+  const a: any = isObj(d.actuals) ? d.actuals : {};
+  const f: any = isObj(d.forecasts) ? d.forecasts : {};
   const str = (v: unknown) => (typeof v === "string" ? v : null);
   return {
     default_cutoff: d.default_cutoff,
@@ -145,7 +147,7 @@ export async function fetchMeta(signal?: AbortSignal): Promise<MetaResponse> {
 export async function fetchForecast(date: string, cutoff: string, signal?: AbortSignal): Promise<ForecastResponse> {
   const d = await get("/api/forecast", { date, cutoff }, signal);
   if (!isObj(d) || !Array.isArray(d.points) || typeof d.decision_time_utc !== "string") invalid("forecast");
-  const s = isObj(d.summary) ? d.summary : {};
+  const s: any = isObj(d.summary) ? d.summary : {};
   const str = (v: unknown) => (typeof v === "string" ? v : null);
   return {
     date: String(d.date ?? date),
@@ -187,7 +189,7 @@ export async function fetchHorizon(start: string, end: string, bucketHours: numb
   return {
     buckets: d.buckets.filter(isObj).filter((b) => num(b.horizon_from_h) !== null && num(b.horizon_to_h) !== null).map((b) => {
       const out: HorizonBucket = { horizon_from_h: b.horizon_from_h as number, horizon_to_h: b.horizon_to_h as number };
-      for (const k of METRIC_KEYS) if (k in b) out[k] = num(b[k]);
+      for (const k of METRIC_KEYS) if (k in b) (out as Record<string, Num>)[k] = num(b[k]);
       return out;
     }),
   };

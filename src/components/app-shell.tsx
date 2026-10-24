@@ -21,7 +21,7 @@ const NAV = [
 export function CutoffSelect({ value, onChange, id }: { value: string | undefined; onChange: (v: string) => void; id: string }) {
   const options = value && !CUTOFF_OPTIONS.includes(value) ? [...CUTOFF_OPTIONS, value].sort() : CUTOFF_OPTIONS;
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={value ?? ""} onValueChange={onChange}>
       <SelectTrigger id={id} className="tabular h-8 w-[92px] text-sm">
         <SelectValue placeholder="--:--" />
       </SelectTrigger>
@@ -67,7 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={to}
                   to={to}
-                  search={((p: Record<string, unknown>) => ({ date: p.date, cutoff: p.cutoff })) as never}
+                  search={((p: Record<string, unknown>) => ({ date: p["date"], cutoff: p["cutoff"] })) as never}
                   title={label}
                   aria-current={active ? "page" : undefined}
                   className={cn(
@@ -90,7 +90,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <header className="sticky top-0 z-20 flex min-h-14 flex-wrap items-center gap-x-4 gap-y-2 border-b border-border bg-card px-4 py-2 md:px-6">
             <nav className="flex gap-1 md:hidden" aria-label="Primary mobile">
               {NAV.map(({ to, label, icon: Icon }) => (
-                <Link key={to} to={to} search={((p: Record<string, unknown>) => ({ date: p.date, cutoff: p.cutoff })) as never} aria-label={label}
+                <Link key={to} to={to} search={((p: Record<string, unknown>) => ({ date: p["date"], cutoff: p["cutoff"] })) as never} aria-label={label}
                   className={cn("flex size-8 items-center justify-center rounded-sm", path.startsWith(to) ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted")}>
                   <Icon className="size-4" aria-hidden />
                 </Link>
