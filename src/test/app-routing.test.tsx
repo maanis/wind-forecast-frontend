@@ -32,8 +32,10 @@ describe("App routing", () => {
     expect(await screen.findByTestId("loc")).toHaveTextContent("/dashboard?date=2026-01-10&cutoff=08:00");
   });
 
-  it("shows the 404 page for unknown routes", async () => {
-    renderAt("/nope");
-    expect(await screen.findByText("Page not found")).toBeInTheDocument();
+  it("redirects unknown routes to / and preserves the query string", async () => {
+    renderAt("/dashboardhg?date=2026-01-10&cutoff=08:00");
+    expect(await screen.findByTestId("loc")).toHaveTextContent(
+      "/dashboard?date=2026-01-10&cutoff=08:00",
+    );
   });
 });
