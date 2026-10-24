@@ -7,6 +7,10 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  vite: {
+    // Pre-bundle chart/UI deps so Vite never re-optimizes mid-session (which loads two React copies).
+    optimizeDeps: { include: ["recharts", "@radix-ui/react-dialog", "@radix-ui/react-tooltip", "@radix-ui/react-select", "lucide-react"] },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

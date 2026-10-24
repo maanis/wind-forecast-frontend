@@ -23,14 +23,14 @@ export function clampDate(v: string): string {
 }
 
 export interface GlobalSearch {
-  date?: string;
-  cutoff?: string;
+  date?: string | undefined;
+  cutoff?: string | undefined;
 }
 
 export function parseGlobalSearch(s: Record<string, unknown>): GlobalSearch {
   return {
-    date: isValidDate(s.date) ? s.date : undefined,
-    cutoff: isValidCutoff(s.cutoff) ? s.cutoff : undefined,
+    date: isValidDate(s["date"]) ? s["date"] : undefined,
+    cutoff: isValidCutoff(s["cutoff"]) ? s["cutoff"] : undefined,
   };
 }
 

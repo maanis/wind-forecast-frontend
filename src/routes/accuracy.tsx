@@ -18,8 +18,8 @@ import { interpretBias } from "@/lib/interpretation";
 export const Route = createFileRoute("/accuracy")({
   validateSearch: (s: Record<string, unknown>) => ({
     ...parseGlobalSearch(s),
-    start: isValidDate(s.start) ? s.start : undefined,
-    end: isValidDate(s.end) ? s.end : undefined,
+    start: isValidDate(s["start"]) ? s["start"] : undefined,
+    end: isValidDate(s["end"]) ? s["end"] : undefined,
   }),
   head: () => ({
     meta: [
